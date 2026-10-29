@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Active Chat">
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#f2f4f8"/>
+  <rect x="28" y="30" width="72" height="16" rx="8" fill="#4f6ef7"/>
+  <circle cx="40" cy="38" r="4" fill="#ffffff"/>
+  <rect x="28" y="56" width="52" height="12" rx="6" fill="#c9d0dd"/>
+  <rect x="28" y="78" width="64" height="12" rx="6" fill="#c9d0dd"/>
+</svg>

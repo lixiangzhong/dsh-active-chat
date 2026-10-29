@@ -1,0 +1,6 @@
+# Mount this bundle into the DSH Web profile.
+# The bundle patch from package.json (dsh.bundle.patch) is composed before the profile
+# patch; this row is what actually instantiates the plugin in the Host plugin tree.
+- insert:
+    - id: dsh-active-chat
+      name: "@lixiangzhong/dsh-active-chat"
