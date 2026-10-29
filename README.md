@@ -30,10 +30,16 @@ drag produces), so it persists across reloads and other sessions.
 
 ## Install
 
-Requires DSH >= 0.2.1-rc.2 with the Web profile. The plugin is a regular DSH bundle; it
-declares no npm dependencies and is safe to install as a linked local bundle.
+Requires DSH >= 0.2.1-rc.2 with the Web profile. This is a regular DSH bundle and declares
+no npm dependencies.
 
-From the DSH plugin manager UI, install this package, or from the CLI:
+Install it from the DSH plugin manager UI, or from the CLI:
+
+```sh
+dsh plugin --profile web add @lixiangzhong/dsh-active-chat
+```
+
+To hack on the package from a local checkout, link that checkout instead:
 
 ```sh
 dsh plugin --profile web add /path/to/dsh-active-chat

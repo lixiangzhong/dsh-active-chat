@@ -21,10 +21,15 @@ DSH 侧栏的工作区顺序只有一份 Host 侧顺序，默认只能手动拖�
 
 ## 安装
 
-需要 DSH >= 0.2.1-rc.2 的 Web profile。本插件是标准 DSH bundle，不声明任何 npm 依赖，
-可作为本地链接包安全安装。
+需要 DSH >= 0.2.1-rc.2 的 Web profile。本插件是标准 DSH bundle，不声明任何 npm 依赖。
 
 在 DSH 插件面板中安装本包，或使用 CLI：
+
+```sh
+dsh plugin --profile web add @lixiangzhong/dsh-active-chat
+```
+
+如果想从本地 checkout 调试，改为链接本地目录：
 
 ```sh
 dsh plugin --profile web add /path/to/dsh-active-chat
