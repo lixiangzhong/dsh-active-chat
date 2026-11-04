@@ -64,6 +64,25 @@ npm test    # syntax checks + behavioural tests (node:test, no browser needed)
 The tests drive the plugin through fake snapshots; the behaviour they cover is the list
 above.
 
+## Releasing
+
+Publishing runs in CI; this repository stores no npm token.
+
+1. Bump the version and let npm write the release commit and tag: `npm version 0.1.1`
+   (add `--no-git-tag-version` if you prefer to write the commit and tag yourself).
+2. Push both: `git push origin master` and `git push origin v0.1.1`
+   (or `git push --follow-tags`). The `v*` tag starts the release workflow.
+3. [`.github/workflows/publish.yml`](.github/workflows/publish.yml) checks that the tag
+   matches `package.json`, runs `npm test`, and publishes through
+   [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC), which
+   also attaches a provenance attestation.
+
+Prerequisite: the npm package must list `.github/workflows/publish.yml` as a trusted
+publisher (user `lixiangzhong`, repository `dsh-active-chat`) with **Allow npm publish**
+enabled — new configurations default to stage-only publishing. A trusted-publisher
+configuration expires unless its first successful publish happens within two days of
+creation.
+
 ## License
 
 MIT

@@ -52,6 +52,16 @@ npm test    # 语法检查 + 行为测试（node:test，无需浏览器）
 
 测试用假的快照驱动插件，覆盖上面列出的全部行为。
 
+## 发布
+
+发布走 CI，仓库里不保存任何 npm token。
+
+1. 升版本号并让 npm 写好发布提交与 tag：`npm version 0.1.1`（想自己手动提交和打 tag 就加 `--no-git-tag-version`）。
+2. 一起推上去：`git push origin master` 与 `git push origin v0.1.1`（或 `git push --follow-tags`）。`v*` tag 会触发发布流程。
+3. [`.github/workflows/publish.yml`](.github/workflows/publish.yml) 会校验 tag 与 `package.json` 版本一致、跑 `npm test`，然后通过 [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers)（OIDC）发布，并自动附上 provenance 证明。
+
+前提：npm 包设置里必须把 `.github/workflows/publish.yml` 注册为 trusted publisher（user `lixiangzhong`、repo `dsh-active-chat`），并勾选 **Allow npm publish**——新建配置默认只允许 staged publish。该配置若创建后两天内没有首次成功发布就会过期。
+
 ## License
 
 MIT
