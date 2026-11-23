@@ -30,7 +30,7 @@ drag produces), so it persists across reloads and other sessions.
 
 ## Install
 
-Requires DSH >= 0.2.1-rc.2 with the Web profile. This is a regular DSH bundle and declares
+Requires DSH >= 0.2.2-rc.3 with the Web profile. This is a regular DSH bundle and declares
 no npm dependencies.
 
 Install it from the DSH plugin manager UI, or from the CLI:
@@ -49,11 +49,14 @@ Then reload the page. To remove it, disable or uninstall the plugin and reload.
 
 ## How it works
 
-`client.js` is a browser-side plugin. It injects the `workspaces`, `sessions` and
-`uiSession` client services, subscribes to their snapshots, and calls the documented
-`ctx.workspaces.insertBefore(workspaceId, beforeWorkspaceId?)` service to move a workspace
-within the Host order. Changes are coalesced and only written when the set of active
-workspaces actually changes. The Host half (`index.js`) is an empty plugin entry.
+`client.js` is a browser-side plugin. It injects the `workspaces`, `sessions`, `uiSession`
+and `uiSession.sessionStatus` client services, subscribes to their snapshots, and calls the
+documented `ctx.workspaces.insertBefore(workspaceId, beforeWorkspaceId?)` service to move a
+workspace within the Host order. The status table became its own `uiSession.sessionStatus`
+service in DSH 0.2.2-rc.3: reading it without injecting that service throws
+`cannot get property "uiSession.sessionStatus" without inject`. Changes are coalesced and
+only written when the set of active workspaces actually changes. The Host half (`index.js`)
+is an empty plugin entry.
 
 ## Development
 
@@ -68,9 +71,9 @@ above.
 
 Publishing runs in CI; this repository stores no npm token.
 
-1. Bump the version and let npm write the release commit and tag: `npm version 0.1.1`
+1. Bump the version and let npm write the release commit and tag: `npm version 0.1.2`
    (add `--no-git-tag-version` if you prefer to write the commit and tag yourself).
-2. Push both: `git push origin master` and `git push origin v0.1.1`
+2. Push both: `git push origin master` and `git push origin v0.1.2`
    (or `git push --follow-tags`). The `v*` tag starts the release workflow.
 3. [`.github/workflows/publish.yml`](.github/workflows/publish.yml) checks that the tag
    matches `package.json`, runs `npm test`, and publishes through

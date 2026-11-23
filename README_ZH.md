@@ -21,7 +21,7 @@ DSH 侧栏的工作区顺序只有一份 Host 侧顺序，默认只能手动拖�
 
 ## 安装
 
-需要 DSH >= 0.2.1-rc.2 的 Web profile。本插件是标准 DSH bundle，不声明任何 npm 依赖。
+需要 DSH >= 0.2.2-rc.3 的 Web profile。本插件是标准 DSH bundle，不声明任何 npm 依赖。
 
 在 DSH 插件面板中安装本包，或使用 CLI：
 
@@ -39,10 +39,12 @@ dsh plugin --profile web add /path/to/dsh-active-chat
 
 ## 实现
 
-`client.js` 是浏览器端插件：注入 `workspaces`、`sessions`、`uiSession` 三个客户端服务，
-订阅它们的快照，并通过官方 `ctx.workspaces.insertBefore(workspaceId, beforeWorkspaceId?)`
-把工作区移动到 Host 顺序中。变更会合并处理，只有活跃工作区集合真正变化时才写入。
-Host 侧 `index.js` 只是一个空的插件入口。
+`client.js` 是浏览器端插件：注入 `workspaces`、`sessions`、`uiSession` 与
+`uiSession.sessionStatus` 四个客户端服务，订阅它们的快照，并通过官方
+`ctx.workspaces.insertBefore(workspaceId, beforeWorkspaceId?)` 把工作区移动到 Host 顺序中。
+会话状态表自 DSH 0.2.2-rc.3 起是独立的 `uiSession.sessionStatus` 服务，未注入就读取会抛
+`cannot get property "uiSession.sessionStatus" without inject`。变更会合并处理，只有活跃工作区
+集合真正变化时才写入。Host 侧 `index.js` 只是一个空的插件入口。
 
 ## 开发
 
@@ -56,8 +58,8 @@ npm test    # 语法检查 + 行为测试（node:test，无需浏览器）
 
 发布走 CI，仓库里不保存任何 npm token。
 
-1. 升版本号并让 npm 写好发布提交与 tag：`npm version 0.1.1`（想自己手动提交和打 tag 就加 `--no-git-tag-version`）。
-2. 一起推上去：`git push origin master` 与 `git push origin v0.1.1`（或 `git push --follow-tags`）。`v*` tag 会触发发布流程。
+1. 升版本号并让 npm 写好发布提交与 tag：`npm version 0.1.2`（想自己手动提交和打 tag 就加 `--no-git-tag-version`）。
+2. 一起推上去：`git push origin master` 与 `git push origin v0.1.2`（或 `git push --follow-tags`）。`v*` tag 会触发发布流程。
 3. [`.github/workflows/publish.yml`](.github/workflows/publish.yml) 会校验 tag 与 `package.json` 版本一致、跑 `npm test`，然后通过 [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers)（OIDC）发布，并自动附上 provenance 证明。
 
 前提：npm 包设置里必须把 `.github/workflows/publish.yml` 注册为 trusted publisher（user `lixiangzhong`、repo `dsh-active-chat`），并勾选 **Allow npm publish**——新建配置默认只允许 staged publish。该配置若创建后两天内没有首次成功发布就会过期。
