@@ -1,6 +1,6 @@
 {
   "name": "@lixiangzhong/dsh-active-chat",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Pin workspaces whose sessions are running or waiting for your reply to the top of the DSH sidebar.",
   "author": "lixiangzhong",
   "repository": {
@@ -39,7 +39,8 @@
     "prepublishOnly": "npm test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "dsh": ">=0.2.2-rc.3"
   },
   "keywords": [
     "dsh",
