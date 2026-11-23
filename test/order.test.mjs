@@ -2,8 +2,10 @@
  * Behavioural tests for the browser half of @lixiangzhong/dsh-active-chat.
  *
  * The plugin is loaded through the same `window.__ModuleLoader__` hook the DSH Web
- * shell provides, then driven by fake `workspaces` / `sessions` / `uiSession` services
- * so the real ordering policy is exercised without a browser.
+ * shell provides, then driven by fake `workspaces` / `sessions` /
+ * `uiSession.sessionStatus` services so the real ordering policy is exercised
+ * without a browser. The fake Context enforces Cordis' inject rule, so a service the
+ * plugin forgets to declare fails here instead of leaving the plugin silently inert.
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -35,6 +37,44 @@ function wait(milliseconds) {
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
+}
+
+/**
+ * Serve the fake services through a Context that enforces Cordis' inject rule.
+ * Reading an undeclared service throws the shell's own `cannot get property ...
+ * without inject` error, including for the nested `uiSession.sessionStatus` service.
+ * @param {string[]} inject Services the plugin declared.
+ * @param {object} services Fake service implementations.
+ * @param {Function} effect Effect runner standing in for `ctx.effect`.
+ * @returns {object} The Context handed to `apply`.
+ */
+function createInjectedContext(inject, services, effect) {
+  const declared = new Set(inject);
+  const requireService = (name) => {
+    if (!declared.has(name)) {
+      throw new Error(`cannot get property "${name}" without inject`);
+    }
+  };
+  return {
+    get workspaces() {
+      requireService('workspaces');
+      return services.workspaces;
+    },
+    get sessions() {
+      requireService('sessions');
+      return services.sessions;
+    },
+    get uiSession() {
+      requireService('uiSession');
+      return {
+        get sessionStatus() {
+          requireService('uiSession.sessionStatus');
+          return services.sessionStatus;
+        },
+      };
+    },
+    effect,
+  };
 }
 
 class FakeEnvironment {
@@ -160,7 +200,7 @@ class FakeEnvironment {
   }
 
   start(plugin) {
-    const ctx = {
+    const services = {
       workspaces: {
         list: {
           getSnapshot: () => this.workspaceSnapshot(),
@@ -175,18 +215,15 @@ class FakeEnvironment {
           subscribe: (listener) => this.subscribe('sessions', listener),
         },
       },
-      uiSession: {
-        sessionStatus: {
-          getSnapshot: () => this.statusesSnapshot(),
-          subscribe: (listener) => this.subscribe('statuses', listener),
-        },
-      },
-      effect: (execute) => {
-        const dispose = execute();
-        this.disposers.push(typeof dispose === 'function' ? dispose : () => {});
-        return () => {};
+      sessionStatus: {
+        getSnapshot: () => this.statusesSnapshot(),
+        subscribe: (listener) => this.subscribe('statuses', listener),
       },
     };
+    const ctx = createInjectedContext(plugin.inject ?? [], services, (execute) => {
+      const dispose = execute();
+      this.disposers.push(typeof dispose === 'function' ? dispose : () => {});
+    });
     plugin.apply(ctx);
   }
 
@@ -221,6 +258,12 @@ async function run(options, scenario) {
     environment.dispose();
   }
 }
+
+test('declares the injected session status service the shell requires', () => {
+  const plugin = createPlugin();
+  assert.ok(plugin.inject.includes('uiSession'));
+  assert.ok(plugin.inject.includes('uiSession.sessionStatus'));
+});
 
 test('boot alignment pins the most recently active workspace first', async () => {
   const base = singleSessionWorkspaces(['w1', 'w2', 'w3']);

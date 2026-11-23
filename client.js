@@ -268,7 +268,13 @@ window.__ModuleLoader__.load({
 
     return {
       name: 'dsh-active-chat',
-      inject: ['workspaces', 'sessions', 'uiSession'],
+      /**
+       * Since DSH 0.2.2-rc.3 the status table is its own `uiSession.sessionStatus`
+       * service: reading `ctx.uiSession.sessionStatus` without injecting it throws
+       * `cannot get property "uiSession.sessionStatus" without inject`, which would
+       * leave this plugin subscribed to nothing.
+       */
+      inject: ['workspaces', 'sessions', 'uiSession', 'uiSession.sessionStatus'],
       apply(ctx) {
         try {
           const order = new ActiveWorkspaceOrder(ctx);
